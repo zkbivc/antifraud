@@ -1,0 +1,42 @@
+
+1. The main idea:
+
+In this code, the main part is a matrix. It saves the friend degrees between each pair of users. It is included in the instance of class “Deg” and the class “Deg” has just one instance in this project. x- and y-axis of the matrix have the same sequence of user IDs, which is the sequence of user coming in the huge data files (batch_payment.txt & stream_payment.txt). Each element stores the friend’s degree between the corresponding IDs on x-axis and y-axis. Since the full matrix would be symmetric about the diagonal elements, the code just stores the lower triangle (below the diagonal elements) in order to save memory spaces.
+
+The friend degree is represented by digit. For example, “1” represents friend with previous transaction; “2” represents the 2nd-degree friend, that is “friend of friend”; “4” represents the 4th-degree friend, and so on. If they do not have any friend relation with each other, I put “0” there. Especially, when a new user ID comes in, before processing his transaction with others, the code will create spaces for the new user and initialize all cells with ‘0’s.
+
+The core idea of the code is to find and process all impacts under the set friend degree of each transactions. For example, the degree (code uses the variable “MaxDeg”) is set to be “4”. When the code process the transactions between “A” and “B”, all their friends blow 4th-degree need to be found and stored. Due to the transaction between “A” and “B”, the matrix element corresponding to “A” and “B” will be placed “1” if the previous value is greater than “1”. (The code would do nothing, if the previous value for the element was “1”.) Next, each element corresponding to A’s friend and B’s friend will be placed “2” if the previous value is greater than “2”. Third, each element corresponding to A’s friend and B’s 2nd-degree friend will be placed “3” if the previous value is greater than “3”, and so on.
+
+When implementing the antifraud function for a transaction, we can check the element value corresponding to the 2 users and decide whether the transaction is trusted or unverified. For “feature 1”, the transaction is “trusted” when the degree value between 2 users is “1”. Otherwise, the transaction is “unverified”. For “feature 2”, the traction is “trusted” when the degree value is “1” or “2”. Otherwise, it is “unverified”. For “feature 3”, the traction is “trusted” when the degree value is a number in (1,2,3,4). Otherwise, the tractions is “unverified”.
+
+New feature: based on the implementation of the 3rd features, the code can let you check even further friend relationship (5-th degree or even higher-order degree). Please make sure the value set in the variable “MaxDeg” equals or is greater than the largest friend degree you want to check. Of course, increasing “MaxDeg” will result in a drastic increase of computation.
+
+
+2. Details
+
+The code is written in Pycharm IDE and following Python 3 scripting rules. Only 1 Python-integrated module is required due to passing the main function arguments.  
+
+Each transaction is undirected. So the code doesn’t distinguish payer and payee.
+
+Although in the given files all user id are digits, the code uses string to save user IDs. I think string provide better accommodation for either digits or string.
+
+The integrated module ‘CSV’ is not capable of reading the data from the two huge data file (“stream_payment.csv” & “stream_payment.csv”). It is always bothered by the punctuations. The code reads all content and splits it by ‘\n’ to form lines (representing each transaction information) and splits each lines to obtain the user IDs.
+
+
+3. Explanation of variable and functions
+
+MaxDeg: the maximal degree taken cared by the code
+Level3: the criterion checked for feature 3. You can change this value and get output from “output3.txt”
+Class Deg: store all friend degree information and process each transaction
+Deg._First(): initialize the matrix with the first 2 users’ ID.
+Deg._NewID(ID): allocate spaces for the new ID.
+Deg._GetFriP(P1): find all friends positions in matrix based on the person’s position (P1)
+Deg._SetDeg(FP1, FP2): set degree value to the pointed matrix element.
+Deg._Tran(ID1, ID2): process a regular transaction between ID1 and ID2.
+Deg._GetDeg(ID1, ID2): get the degree of friend between ID1 and ID2.
+Deg.OpenFiles(FileOut): open or create files to save results with the file names listed in FileOut
+Deg.CloseFiles(): close all files opened by OpenFiles(FileOut)
+Deg._Output2File(theDeg): output the results to the files when the files are opened.
+Deg._SendWanning(theDeg): Based on the friend degree to decide whether to send warning or not. This function is commented since more information is required like where to send the warning.
+Deg.ProcTran(ID1, ID2): process each transaction, including outputting results.
+GetID(FileName): pre-process the data stored in the file “FileName” and extract the user’s ID. Actually, the adoption of this function doesn’t affect the code’s ability to dynamically handle the stream data.
